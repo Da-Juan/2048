@@ -34,9 +34,7 @@ class Cell:
         add_value = v if isinstance(v, int) else v.value
         if self.value != 0 and add_value != 0:
             self.added = True
-            self.moved = True
-        else:
-            self.moved = True
+        self.moved = True
         self.value += add_value
 
     def __iadd__(self, v: Union[int, "Cell"]) -> "Cell":
