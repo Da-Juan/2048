@@ -1,0 +1,23 @@
+[flake8]
+max-line-length = 80
+select = C,D,E,F,I,W,B,B950
+ignore =
+     # Recommended by black
+     E501,
+     W503,
+     E203
+exclude =
+    venv*/,
+    .tox,
+    .git,
+    __pycache__,
+    docs/_build,
+    build,
+    dist,
+    *.pyc,
+    *.egg-info,
+    .cache,
+    .eggs,
+    migrations
+
+format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
