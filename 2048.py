@@ -21,6 +21,7 @@ class Cell:
     value: int = 0
     added: bool = False
     moved: bool = False
+    new: bool = False
 
     def __str__(self) -> str:
         return f"{self.value}"
@@ -71,6 +72,7 @@ class Matrix:
             y = random.randrange(0, MATRIX_HEIGHT)
             if self.matrix[y][x] == 0:
                 self.matrix[y][x].value = random.choices((2, 4), (80, 20))[0]
+                self.matrix[y][x].new = True
                 break
 
     def is_full(self) -> bool:
@@ -108,7 +110,13 @@ class Matrix:
         for row in self.matrix:
             row_to_print = "|"
             for cell in row:
-                row_to_print += f"{str(cell) if cell else ' ':^{CELL_WIDTH}}|"
+                if cell.new:
+                    row_to_print += "\033[1m"
+                row_to_print += f"{str(cell) if cell else ' ':^{CELL_WIDTH}}"
+                if cell.new:
+                    row_to_print += "\033[0m"
+                    cell.new = False
+                row_to_print += "|"
             print(row_to_print)
             print(self._delimiter)
 
