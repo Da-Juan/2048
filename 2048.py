@@ -6,8 +6,6 @@ from typing import Set, Union
 
 MATRIX_HEIGHT = 4
 MATRIX_WIDTH = 4
-NEW_VALUE_MIN = 2
-NEW_VALUE_MAX = 4
 CELL_WIDTH = 6
 
 
@@ -72,16 +70,8 @@ class Matrix:
             x = random.randrange(0, MATRIX_WIDTH)
             y = random.randrange(0, MATRIX_HEIGHT)
             if self.matrix[y][x] == 0:
-                self.matrix[y][x].value = self.gen_new_value()
+                self.matrix[y][x].value = random.choices((2, 4), (80, 20))[0]
                 break
-
-    def gen_new_value(self) -> int:
-        values = []
-        v = NEW_VALUE_MIN
-        while v <= NEW_VALUE_MAX:
-            values.append(v)
-            v *= 2
-        return random.choice(values)
 
     def is_full(self) -> bool:
         if self.find_value(0):
