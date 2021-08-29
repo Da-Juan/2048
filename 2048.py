@@ -41,6 +41,9 @@ class Cell:
         self.__add__(v)
         return self
 
+    def __bool__(self):
+        return not self.value == 0
+
 
 class Matrix:
     def __init__(self):
@@ -112,7 +115,7 @@ class Matrix:
         for row in self.matrix:
             row_to_print = "|"
             for cell in row:
-                row_to_print += f"{' ' if cell == 0 else str(cell):^{CELL_WIDTH}}|"
+                row_to_print += f"{str(cell) if cell else ' ':^{CELL_WIDTH}}|"
             print(row_to_print)
             print(self._delimiter)
 
