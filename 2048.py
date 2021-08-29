@@ -57,6 +57,7 @@ class Matrix:
 
         self.matrix = matrix
         self.add_new_value()
+        self.add_new_value()
         self.score = 0
 
     @property
