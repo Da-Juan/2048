@@ -50,16 +50,14 @@ class Matrix:
         for _ in range(0, MATRIX_HEIGHT):
             matrix.append([Cell() for _ in range(0, MATRIX_WIDTH)])
 
-        self._delimiter = self._build_delimiter()
         self.matrix = matrix
         self.add_new_value()
         self.score = 0
 
-    def _build_delimiter(self):
-        delimiter = "+"
-        for _ in range(0, MATRIX_WIDTH):
-            delimiter += f"{'-' * CELL_WIDTH}+"
-        return delimiter
+    @property
+    def _delimiter(self):
+        cell_delimiter = f"{'-' * CELL_WIDTH}+"
+        return f"+{cell_delimiter * len(self.matrix[0])}"
 
     def add_new_value(self):
         if not self.find_value(0):
