@@ -178,7 +178,7 @@ class Matrix:
                 self.matrix[y][x].moved = False
 
 
-if __name__ == "__main__":
+def main() -> None:
     matrix = Matrix()
     matrix.print()
     while True:
@@ -198,3 +198,7 @@ if __name__ == "__main__":
         if matrix.is_full():
             print("Game over!")
             break
+
+
+if __name__ == "__main__":
+    main()
