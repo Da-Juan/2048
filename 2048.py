@@ -2,7 +2,7 @@
 import random
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Union
+from typing import Set, Union
 
 MATRIX_HEIGHT = 4
 MATRIX_WIDTH = 4
@@ -27,8 +27,10 @@ class Cell:
     def __str__(self) -> str:
         return f"{self.value}"
 
-    def __eq__(self, cmp: Union[int, "Cell"]) -> bool:
-        return self.value == (cmp if isinstance(cmp, int) else cmp.value)
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, (int, Cell)):
+            return NotImplemented
+        return self.value == (other if isinstance(other, int) else other.value)
 
     def __add__(self, v: Union[int, "Cell"]) -> None:
         add_value = v if isinstance(v, int) else v.value
@@ -41,12 +43,12 @@ class Cell:
         self.__add__(v)
         return self
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return not self.value == 0
 
 
 class Matrix:
-    def __init__(self):
+    def __init__(self) -> None:
         random.seed()
 
         matrix = []
@@ -58,11 +60,11 @@ class Matrix:
         self.score = 0
 
     @property
-    def _delimiter(self):
+    def _delimiter(self) -> str:
         cell_delimiter = f"{'-' * CELL_WIDTH}+"
         return f"+{cell_delimiter * len(self.matrix[0])}"
 
-    def add_new_value(self):
+    def add_new_value(self) -> None:
         if not self.find_value(0):
             return
         while True:
@@ -72,7 +74,7 @@ class Matrix:
                 self.matrix[y][x].value = self.gen_new_value()
                 break
 
-    def gen_new_value(self):
+    def gen_new_value(self) -> int:
         values = []
         v = NEW_VALUE_MIN
         while v <= NEW_VALUE_MAX:
@@ -80,7 +82,7 @@ class Matrix:
             v *= 2
         return random.choice(values)
 
-    def is_full(self):
+    def is_full(self) -> bool:
         if self.find_value(0):
             return False
         for y in range(0, MATRIX_HEIGHT):
@@ -98,7 +100,7 @@ class Matrix:
                     return True
         return False
 
-    def get_neighbors(self, x: int, y: int):
+    def get_neighbors(self, x: int, y: int) -> Set[int]:
         neighbors = [0, 0, 0, 0]
         if y > 0:
             neighbors[0] = self.matrix[y - 1][x].value
@@ -110,7 +112,7 @@ class Matrix:
             neighbors[3] = self.matrix[y][x - 1].value
         return set(neighbors)
 
-    def print(self):
+    def print(self) -> None:
         print(self._delimiter)
         for row in self.matrix:
             row_to_print = "|"
@@ -119,15 +121,15 @@ class Matrix:
             print(row_to_print)
             print(self._delimiter)
 
-    def rotate_cw(self):
+    def rotate_cw(self) -> None:
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element) for element in rotated]
 
-    def rotate_ccw(self):
+    def rotate_ccw(self) -> None:
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
-    def move(self, direction: Enum):
+    def move(self, direction: Direction) -> None:
         if direction == Direction.UP:
             self.rotate_cw()
         if direction == Direction.DOWN:
@@ -154,7 +156,7 @@ class Matrix:
         else:
             print("Nothing moved")
 
-    def move_cell_to_right(self, x, y):
+    def move_cell_to_right(self, x: int, y: int) -> None:
         if self.matrix[y][x + 1] == 0 or (
             not self.matrix[y][x].added
             and not self.matrix[y][x + 1].added
@@ -168,10 +170,10 @@ class Matrix:
                 return
             self.move_cell_to_right(x + 1, y)
 
-    def has_moved(self):
+    def has_moved(self) -> bool:
         return any([cell.moved for row in self.matrix for cell in row])
 
-    def clean_cells_after_move(self):
+    def clean_cells_after_move(self) -> None:
         for y in range(0, MATRIX_HEIGHT):
             for x in range(0, MATRIX_WIDTH):
                 self.matrix[y][x].added = False
