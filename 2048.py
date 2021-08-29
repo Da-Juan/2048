@@ -2,7 +2,7 @@
 import random
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Set, Union
+from typing import Union
 
 MATRIX_HEIGHT = 4
 MATRIX_WIDTH = 4
@@ -91,7 +91,7 @@ class Matrix:
                     return True
         return False
 
-    def get_neighbors(self, x: int, y: int) -> Set[int]:
+    def get_neighbors(self, x: int, y: int) -> tuple[int, ...]:
         neighbors = [0, 0, 0, 0]
         if y > 0:
             neighbors[0] = self.matrix[y - 1][x].value
@@ -101,7 +101,7 @@ class Matrix:
             neighbors[2] = self.matrix[y][x + 1].value
         if x > 0:
             neighbors[3] = self.matrix[y][x - 1].value
-        return set(neighbors)
+        return tuple(neighbors)
 
     def print(self) -> None:
         print(self._delimiter)
