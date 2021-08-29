@@ -65,15 +65,12 @@ class Matrix:
         return f"+{cell_delimiter * len(self.matrix[0])}"
 
     def add_new_value(self) -> None:
-        if not self.find_value(0):
+        free_cells = self.find_value(0)
+        if not free_cells:
             return
-        while True:
-            x = random.randrange(0, MATRIX_WIDTH)
-            y = random.randrange(0, MATRIX_HEIGHT)
-            if self.matrix[y][x] == 0:
-                self.matrix[y][x].value = random.choices((2, 4), (80, 20))[0]
-                self.matrix[y][x].new = True
-                break
+        x, y = random.choice(free_cells)
+        self.matrix[y][x].value = random.choices((2, 4), (80, 20))[0]
+        self.matrix[y][x].new = True
 
     def is_full(self) -> bool:
         if self.find_value(0):
@@ -86,12 +83,13 @@ class Matrix:
                     return False
         return True
 
-    def find_value(self, value: int) -> bool:
-        for row in self.matrix:
-            for cell in row:
+    def find_value(self, value: int) -> list[tuple[int, int]]:
+        coordinates = []
+        for y, row in enumerate(self.matrix):
+            for x, cell in enumerate(row):
                 if cell == value:
-                    return True
-        return False
+                    coordinates.append((x, y))
+        return coordinates
 
     def get_neighbors(self, x: int, y: int) -> tuple[int, ...]:
         neighbors = [0, 0, 0, 0]
