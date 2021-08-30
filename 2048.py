@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import curses
 import random
 from dataclasses import dataclass
 from enum import Enum, auto
@@ -7,6 +8,7 @@ from typing import Union
 MATRIX_HEIGHT = 4
 MATRIX_WIDTH = 4
 CELL_WIDTH = 6
+SCORE_WIDTH = 6
 
 
 class Direction(Enum):
@@ -59,11 +61,6 @@ class Matrix:
         self.add_new_value()
         self.score = 0
 
-    @property
-    def _delimiter(self) -> str:
-        cell_delimiter = f"{'-' * CELL_WIDTH}+"
-        return f"+{cell_delimiter * len(self.matrix[0])}"
-
     def add_new_value(self) -> None:
         free_cells = self.find_value(0)
         if not free_cells:
@@ -103,21 +100,6 @@ class Matrix:
             neighbors[3] = self.matrix[y][x - 1].value
         return tuple(neighbors)
 
-    def print(self) -> None:
-        print(self._delimiter)
-        for row in self.matrix:
-            row_to_print = "|"
-            for cell in row:
-                if cell.new:
-                    row_to_print += "\033[1m"
-                row_to_print += f"{str(cell) if cell else ' ':^{CELL_WIDTH}}"
-                if cell.new:
-                    row_to_print += "\033[0m"
-                    cell.new = False
-                row_to_print += "|"
-            print(row_to_print)
-            print(self._delimiter)
-
     def rotate_cw(self) -> None:
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element) for element in rotated]
@@ -127,6 +109,7 @@ class Matrix:
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
     def move(self, direction: Direction) -> None:
+        self.prepare_cells_to_move()
         if direction == Direction.UP:
             self.rotate_cw()
         if direction == Direction.DOWN:
@@ -148,10 +131,7 @@ class Matrix:
             self.rotate_ccw()
             self.rotate_ccw()
         if self.has_moved():
-            self.clean_cells_after_move()
             self.add_new_value()
-        else:
-            print("Nothing moved")
 
     def move_cell_to_right(self, x: int, y: int) -> None:
         if self.matrix[y][x + 1] == 0 or (
@@ -170,34 +150,78 @@ class Matrix:
     def has_moved(self) -> bool:
         return any([cell.moved for row in self.matrix for cell in row])
 
-    def clean_cells_after_move(self) -> None:
-        for y in range(0, MATRIX_HEIGHT):
-            for x in range(0, MATRIX_WIDTH):
-                self.matrix[y][x].added = False
-                self.matrix[y][x].moved = False
+    def prepare_cells_to_move(self) -> None:
+        for row in self.matrix:
+            for cell in row:
+                cell.added = False
+                cell.moved = False
+                cell.new = False
 
 
-def main() -> None:
+def draw_matrix(window: "curses._CursesWindow", matrix: list[list[Cell]]) -> None:
+    cell_delimiter = f"{'-' * CELL_WIDTH}+"
+    delimiter = f"+{cell_delimiter * len(matrix[0])}"
+    window.erase()
+    window.addstr(f"{delimiter}\n")
+    for row in matrix:
+        window.addstr("|")
+        for cell in row:
+            value = f"{str(cell) if cell else ' ':^{CELL_WIDTH}}"
+            if cell.new:
+                window.addstr(value, curses.A_BOLD)
+            else:
+                window.addstr(value)
+            window.addstr("|")
+        window.addstr("\n")
+        window.addstr(f"{delimiter}\n")
+    window.refresh()
+
+
+def draw_score(window: "curses._CursesWindow", score: int) -> None:
+    window.erase()
+    window.addstr(f"Score: {score}")
+    window.refresh()
+
+
+def main(stdscr: "curses._CursesWindow") -> int:
+    curses.curs_set(0)
     matrix = Matrix()
-    matrix.print()
+
+    stdscr.clear()
+    matrix_win_width = CELL_WIDTH * MATRIX_WIDTH + MATRIX_WIDTH + 2
+    matrix_win_height = MATRIX_HEIGHT * 2 + 2
+
+    matrix_win = stdscr.derwin(matrix_win_height, matrix_win_width, 0, 0)
+    score_win_width = SCORE_WIDTH + 7
+    score_win = stdscr.derwin(
+        matrix_win_height, score_win_width, 0, matrix_win_width + 1
+    )
+
+    draw_score(score_win, matrix.score)
+    draw_matrix(matrix_win, matrix.matrix)
+
     while True:
-        d = input("Direction: ")
-        if d == "u":
+        c = stdscr.getch()
+        if c == ord("q"):
+            break  # Exit the while loop
+        elif c == curses.KEY_UP:
             matrix.move(Direction.UP)
-        if d == "d":
+        elif c == curses.KEY_DOWN:
             matrix.move(Direction.DOWN)
-        if d == "r":
+        elif c == curses.KEY_RIGHT:
             matrix.move(Direction.RIGHT)
-        if d == "l":
+        elif c == curses.KEY_LEFT:
             matrix.move(Direction.LEFT)
-        if d == "q":
-            break
-        matrix.print()
-        print(f"Score: {matrix.score}")
+        draw_matrix(matrix_win, matrix.matrix)
+        draw_score(score_win, matrix.score)
         if matrix.is_full():
-            print("Game over!")
+            # Game over!
             break
+    return matrix.is_full(), matrix.score
 
 
 if __name__ == "__main__":
-    main()
+    game_over, score = curses.wrapper(main)
+    if game_over:
+        print("Game over!")
+    print(f"Game ended, your score is {score}")
