@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""My take on the 2048 game."""
 import curses
 import random
 from dataclasses import dataclass
@@ -12,6 +13,8 @@ SCORE_WIDTH = 6
 
 
 class Direction(Enum):
+    """Game moves."""
+
     UP = auto()
     DOWN = auto()
     LEFT = auto()
@@ -20,20 +23,25 @@ class Direction(Enum):
 
 @dataclass
 class Cell:
+    """Matrix's cell."""
+
     value: int = 0
     added: bool = False
     moved: bool = False
     new: bool = False
 
     def __str__(self) -> str:
+        """Sting representation."""
         return str(self.value)
 
     def __eq__(self, other: object) -> bool:
+        """Compare cell's value with another cell's value or an integer."""
         if not isinstance(other, (int, Cell)):
             return NotImplemented
         return self.value == (other if isinstance(other, int) else other.value)
 
     def __add__(self, v: Union[int, "Cell"]) -> None:
+        """Add another cell's value or an integer."""
         add_value = v if isinstance(v, int) else v.value
         if self.value != 0 and add_value != 0:
             self.added = True
@@ -41,15 +49,20 @@ class Cell:
         self.value += add_value
 
     def __iadd__(self, other: Union[int, "Cell"]) -> "Cell":
+        """Inplace add."""
         self + other
         return self
 
     def __bool__(self) -> bool:
+        """Boolean operation."""
         return not self.value == 0
 
 
 class Matrix:
+    """Game matrix."""
+
     def __init__(self) -> None:
+        """Initialize game matrix."""
         random.seed()
 
         self.matrix = [
@@ -60,6 +73,11 @@ class Matrix:
         self.score = 0
 
     def add_new_value(self) -> None:
+        """
+        Add a new value, chosen between 2 and 4, to a random free cell if available.
+
+        2 has an 80% chances to be drawn.
+        """
         free_cells = self.find_value(0)
         if not free_cells:
             return
@@ -68,6 +86,7 @@ class Matrix:
         self.matrix[y][x].new = True
 
     def is_full(self) -> bool:
+        """Check if the matrix has empty (zero) cells or if cells can move."""
         if self.find_value(0):
             return False
         for y in range(0, MATRIX_HEIGHT):
@@ -79,6 +98,7 @@ class Matrix:
         return True
 
     def find_value(self, value: int) -> list[tuple[int, int]]:
+        """Get the cells' coordinates of a given value."""
         coordinates = []
         for y, row in enumerate(self.matrix):
             for x, cell in enumerate(row):
@@ -87,6 +107,7 @@ class Matrix:
         return coordinates
 
     def get_neighbors(self, x: int, y: int) -> tuple[int, ...]:
+        """Get values of the target cell's neighbors(N, S, E, W)."""
         neighbors = [0, 0, 0, 0]
         if y > 0:
             neighbors[0] = self.matrix[y - 1][x].value
@@ -99,14 +120,22 @@ class Matrix:
         return tuple(neighbors)
 
     def rotate_cw(self) -> None:
+        """Rotate the matrix 90° clockwise."""
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element) for element in rotated]
 
     def rotate_ccw(self) -> None:
+        """Rotate the matrix 90° counter clockwise."""
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
     def move(self, direction: Direction) -> None:
+        r"""
+        Move cells in the given direction.
+
+        According to next method I can only move cells to the right so to move in other
+        directions I rotate the matrix. ¯\_(ツ)_/¯
+        """
         self.prepare_cells_to_move()
         if direction == Direction.UP:
             self.rotate_cw()
@@ -132,6 +161,16 @@ class Matrix:
             self.add_new_value()
 
     def move_cell_to_right(self, x: int, y: int) -> None:
+        """
+        Move cells to the right.
+
+        A non-zero cell moves freely over zero cells.
+        If a cell of the same value is encountered, the cells are merged(values are
+        added).
+        If a different value is encountered, the movement stops.
+        If a cell has already been merged it cannot be merged again during this turn.
+        The rightmost cells are added first.
+        """
         if self.matrix[y][x + 1] == 0 or (
             not self.matrix[y][x].added
             and not self.matrix[y][x + 1].added
@@ -146,9 +185,11 @@ class Matrix:
             self.move_cell_to_right(x + 1, y)
 
     def has_moved(self) -> bool:
+        """Check if cells have moved in the martix."""
         return any([cell.moved for row in self.matrix for cell in row])
 
     def prepare_cells_to_move(self) -> None:
+        """Cleanup cells' flags."""
         for row in self.matrix:
             for cell in row:
                 cell.added = False
@@ -157,6 +198,11 @@ class Matrix:
 
 
 def draw_matrix(window: "curses._CursesWindow", matrix: list[list[Cell]]) -> None:
+    """
+    Draw the matrix in its window.
+
+    New cells are drawn in bold.
+    """
     cell_delimiter = f"{'-' * CELL_WIDTH}+"
     delimiter = f"+{cell_delimiter * len(matrix[0])}"
     window.erase()
@@ -176,12 +222,20 @@ def draw_matrix(window: "curses._CursesWindow", matrix: list[list[Cell]]) -> Non
 
 
 def draw_score(window: "curses._CursesWindow", score: int) -> None:
+    """Draw the score in its window."""
     window.erase()
     window.addstr(f"Score: {score}")
     window.refresh()
 
 
 def main(stdscr: "curses._CursesWindow") -> tuple[bool, int]:
+    """
+    Set up windows and run the game loop.
+
+    Returns:
+        game_over: True is no cell can move
+        score: The final game score
+    """
     curses.curs_set(0)
     matrix = Matrix()
 
