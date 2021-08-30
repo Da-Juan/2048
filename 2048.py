@@ -183,7 +183,7 @@ def draw_score(window: "curses._CursesWindow", score: int) -> None:
     window.refresh()
 
 
-def main(stdscr: "curses._CursesWindow") -> int:
+def main(stdscr: "curses._CursesWindow") -> tuple[bool, int]:
     curses.curs_set(0)
     matrix = Matrix()
 
