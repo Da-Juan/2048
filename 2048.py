@@ -26,7 +26,7 @@ class Cell:
     new: bool = False
 
     def __str__(self) -> str:
-        return f"{self.value}"
+        return str(self.value)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (int, Cell)):
@@ -40,8 +40,8 @@ class Cell:
         self.moved = True
         self.value += add_value
 
-    def __iadd__(self, v: Union[int, "Cell"]) -> "Cell":
-        self.__add__(v)
+    def __iadd__(self, other: Union[int, "Cell"]) -> "Cell":
+        self + other
         return self
 
     def __bool__(self) -> bool:
@@ -52,11 +52,9 @@ class Matrix:
     def __init__(self) -> None:
         random.seed()
 
-        matrix = []
-        for _ in range(0, MATRIX_HEIGHT):
-            matrix.append([Cell() for _ in range(0, MATRIX_WIDTH)])
-
-        self.matrix = matrix
+        self.matrix = [
+            [Cell() for _ in range(MATRIX_WIDTH)] for _ in range(MATRIX_HEIGHT)
+        ]
         self.add_new_value()
         self.add_new_value()
         self.score = 0
