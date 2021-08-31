@@ -76,13 +76,13 @@ class Matrix:
         """
         Add a new value, chosen between 2 and 4, to a random free cell if available.
 
-        2 has an 80% chances to be drawn.
+        2 has an 90% chances to be drawn.
         """
         free_cells = self.find_value(0)
         if not free_cells:
             return
         x, y = random.choice(free_cells)
-        self.matrix[y][x].value = random.choices((2, 4), (80, 20))[0]
+        self.matrix[y][x].value = random.choices((2, 4), (90, 10))[0]
         self.matrix[y][x].new = True
 
     def is_full(self) -> bool:
