@@ -40,9 +40,9 @@ class Cell:
             return NotImplemented
         return self.value == (other if isinstance(other, int) else other.value)
 
-    def __add__(self, v: Union[int, "Cell"]) -> None:
+    def __add__(self, other: Union[int, "Cell"]) -> None:
         """Add another cell's value or an integer."""
-        add_value = v if isinstance(v, int) else v.value
+        add_value = other if isinstance(other, int) else other.value
         if self.value != 0 and add_value != 0:
             self.added = True
         self.moved = True
@@ -186,7 +186,7 @@ class Matrix:
 
     def has_moved(self) -> bool:
         """Check if cells have moved in the martix."""
-        return any([cell.moved for row in self.matrix for cell in row])
+        return any(cell.moved for row in self.matrix for cell in row)
 
     def prepare_cells_to_move(self) -> None:
         """Cleanup cells' flags."""
@@ -221,10 +221,10 @@ def draw_matrix(window: "curses._CursesWindow", matrix: list[list[Cell]]) -> Non
     window.refresh()
 
 
-def draw_score(window: "curses._CursesWindow", score: int) -> None:
+def draw_score(window: "curses._CursesWindow", value: int) -> None:
     """Draw the score in its window."""
     window.erase()
-    window.addstr(f"Score: {score}")
+    window.addstr(f"Score: {value}")
     window.refresh()
 
 
@@ -253,16 +253,16 @@ def main(stdscr: "curses._CursesWindow") -> tuple[bool, int]:
     draw_matrix(matrix_win, matrix.matrix)
 
     while True:
-        c = stdscr.getch()
-        if c == ord("q"):
+        key = stdscr.getch()
+        if key == ord("q"):
             break  # Exit the while loop
-        elif c == curses.KEY_UP:
+        if key == curses.KEY_UP:
             matrix.move(Direction.UP)
-        elif c == curses.KEY_DOWN:
+        elif key == curses.KEY_DOWN:
             matrix.move(Direction.DOWN)
-        elif c == curses.KEY_RIGHT:
+        elif key == curses.KEY_RIGHT:
             matrix.move(Direction.RIGHT)
-        elif c == curses.KEY_LEFT:
+        elif key == curses.KEY_LEFT:
             matrix.move(Direction.LEFT)
         draw_matrix(matrix_win, matrix.matrix)
         draw_score(score_win, matrix.score)
