@@ -103,12 +103,12 @@ class Matrix:
 
     def rotate_cw(self: "Matrix") -> None:
         """Rotate the matrix 90° clockwise."""
-        rotated = list(zip(*reversed(self.matrix)))
+        rotated = list(zip(*reversed(self.matrix), strict=False))
         self.matrix = [list(element) for element in rotated]
 
     def rotate_ccw(self: "Matrix") -> None:
         """Rotate the matrix 90° counter clockwise."""
-        rotated = list(zip(*reversed(self.matrix)))
+        rotated = list(zip(*reversed(self.matrix), strict=False))
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
     def move(self: "Matrix", direction: Direction) -> None:
