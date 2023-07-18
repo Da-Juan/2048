@@ -1,5 +1,8 @@
 """Game engine."""
 import curses
+import datetime
+import pathlib
+import sqlite3
 from typing import Any
 
 from direction import Direction
@@ -10,6 +13,7 @@ MATRIX_HEIGHT = 4
 MATRIX_WIDTH = 4
 CELL_WIDTH = 6
 SCORE_WIDTH = 6
+SCORE_DB = "~/.2048.db"
 
 
 class Game:
@@ -40,17 +44,57 @@ class Game:
         curses.cbreak()
         curses.noecho()
 
+        self.load_scores()
         self.draw_score()
         self.draw_matrix()
 
         return self
 
-    def __exit__(self, exc_type: Exception, exc_value: Any, exc_traceback: Any):
+    def __exit__(self, exc_type: Exception, exc_value: Any, exc_traceback: Any) -> None:
         """Cleanup curses."""
         curses.nocbreak()
-        self._stdscr.keypad(0)
+        self._stdscr.keypad(False)  # noqa: FBT003
         curses.echo()
         curses.endwin()
+
+        self.save_score()
+
+    def load_scores(self) -> None:
+        """Load the list of scores."""
+        score_conn = sqlite3.connect(pathlib.Path(SCORE_DB).expanduser())
+        cursor = score_conn.cursor()
+        self.scores = []
+        try:
+            results = cursor.execute("SELECT score FROM scores ORDER BY score DESC")
+            self.scores = [result[0] for result in results.fetchall()]
+        except sqlite3.OperationalError:
+            cursor.execute("CREATE TABLE scores (date date, score int)")
+
+    def save_score(self) -> None:
+        """Save the current game score."""
+        if self.matrix.score == 0:
+            return
+        score_conn = sqlite3.connect(pathlib.Path(SCORE_DB).expanduser())
+        cursor = score_conn.cursor()
+        cursor.execute(
+            "INSERT INTO scores VALUES (?, ?)",
+            (datetime.datetime.now(tz=datetime.UTC), self.matrix.score),
+        )
+        score_conn.commit()
+
+    def get_score_position(self) -> int:
+        """Get the rank of the current game's score."""
+        if not self.scores:
+            return 1
+
+        if self.matrix.score > self.scores[0]:
+            return 1
+
+        for index, score in enumerate(self.scores):
+            if self.matrix.score >= score:
+                return index + 1
+
+        return 0
 
     def run(self):
         """Run the game loop."""
@@ -71,7 +115,7 @@ class Game:
             if self.matrix.is_full():
                 # Game over!
                 break
-        return self.matrix.is_full(), self.matrix.score
+        return self.matrix.is_full(), self.matrix.score, self.get_score_position()
 
     def draw_matrix(self) -> None:
         """
@@ -99,5 +143,8 @@ class Game:
     def draw_score(self) -> None:
         """Draw the score in its window."""
         self.score_win.erase()
-        self.score_win.addstr(f"Score: {self.matrix.score}")
+        score = f"Score: {self.matrix.score}"
+        if self.scores and self.matrix.score > self.scores[0]:
+            score += f"\n(+{self.matrix.score - self.scores[0]})"
+        self.score_win.addstr(score)
         self.score_win.refresh()
