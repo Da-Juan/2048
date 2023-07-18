@@ -30,11 +30,17 @@ class Game:
         self.matrix_win_height = MATRIX_HEIGHT * 2 + 2
 
         self.matrix_win = self._stdscr.derwin(
-            self.matrix_win_height, self.matrix_win_width, 0, 0
+            self.matrix_win_height,
+            self.matrix_win_width,
+            0,
+            0,
         )
         self.score_win_width = SCORE_WIDTH + 7
         self.score_win = self._stdscr.derwin(
-            self.matrix_win_height, self.score_win_width, 0, self.matrix_win_width + 1
+            self.matrix_win_height,
+            self.score_win_width,
+            0,
+            self.matrix_win_width + 1,
         )
 
     def __enter__(self: "Game") -> "Game":
