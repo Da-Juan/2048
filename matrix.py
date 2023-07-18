@@ -1,7 +1,7 @@
 """Game elements."""
 import random
 from dataclasses import dataclass
-from typing import Union
+from typing import Self
 
 from direction import Direction
 
@@ -15,17 +15,17 @@ class Cell:
     moved: bool = False
     new: bool = False
 
-    def __str__(self) -> str:
+    def __str__(self: "Cell") -> str:
         """Sting representation."""
         return str(self.value)
 
-    def __eq__(self, other: object) -> bool:
+    def __eq__(self: "Cell", other: object) -> bool:
         """Compare cell's value with another cell's value or an integer."""
         if not isinstance(other, (int, Cell)):
             return NotImplemented
         return self.value == (other if isinstance(other, int) else other.value)
 
-    def __iadd__(self, other: Union[int, "Cell"]) -> "Cell":
+    def __iadd__(self: Self, other: int | Self) -> Self:
         """Inplace add."""
         add_value = other if isinstance(other, int) else other.value
         if self.value != 0 and add_value != 0:
@@ -34,7 +34,7 @@ class Cell:
         self.value += add_value
         return self
 
-    def __bool__(self) -> bool:
+    def __bool__(self: "Cell") -> bool:
         """Boolean operation."""
         return not self.value == 0
 
@@ -42,7 +42,7 @@ class Cell:
 class Matrix:
     """Game matrix."""
 
-    def __init__(self, width, height) -> None:
+    def __init__(self: "Matrix", width: int, height: int) -> None:
         """Initialize game matrix."""
         random.seed()
 
@@ -55,7 +55,7 @@ class Matrix:
         self.add_new_value()
         self.score = 0
 
-    def add_new_value(self) -> None:
+    def add_new_value(self: "Matrix") -> None:
         """
         Add a new value, chosen between 2 and 4, to a random free cell if available.
 
@@ -68,7 +68,7 @@ class Matrix:
         self.matrix[y][x].value = random.choices((2, 4), (9, 1))[0]
         self.matrix[y][x].new = True
 
-    def is_full(self) -> bool:
+    def is_full(self: "Matrix") -> bool:
         """Check if the matrix has empty (zero) cells or if cells can move."""
         if self.find_value(0):
             return False
@@ -80,7 +80,7 @@ class Matrix:
                     return False
         return True
 
-    def find_value(self, value: int) -> list[tuple[int, int]]:
+    def find_value(self: "Matrix", value: int) -> list[tuple[int, int]]:
         """Get the cells' coordinates of a given value."""
         coordinates = []
         for y, row in enumerate(self.matrix):
@@ -89,7 +89,7 @@ class Matrix:
                     coordinates.append((x, y))
         return coordinates
 
-    def get_neighbors(self, x: int, y: int) -> tuple[int, ...]:
+    def get_neighbors(self: "Matrix", x: int, y: int) -> tuple[int, ...]:
         """Get values of the target cell's neighbors(N, S, E, W)."""
         neighbors = [0, 0, 0, 0]
         if y > 0:
@@ -102,17 +102,17 @@ class Matrix:
             neighbors[3] = self.matrix[y][x - 1].value
         return tuple(neighbors)
 
-    def rotate_cw(self) -> None:
+    def rotate_cw(self: "Matrix") -> None:
         """Rotate the matrix 90° clockwise."""
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element) for element in rotated]
 
-    def rotate_ccw(self) -> None:
+    def rotate_ccw(self: "Matrix") -> None:
         """Rotate the matrix 90° counter clockwise."""
         rotated = list(zip(*reversed(self.matrix)))
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
-    def move(self, direction: Direction) -> None:
+    def move(self: "Matrix", direction: Direction) -> None:
         r"""
         Move cells in the given direction.
 
@@ -143,7 +143,7 @@ class Matrix:
         if self.has_moved():
             self.add_new_value()
 
-    def move_cell_to_right(self, x: int, y: int) -> None:
+    def move_cell_to_right(self: "Matrix", x: int, y: int) -> None:
         """
         Move cells to the right.
 
@@ -167,11 +167,11 @@ class Matrix:
                 return
             self.move_cell_to_right(x + 1, y)
 
-    def has_moved(self) -> bool:
+    def has_moved(self: "Matrix") -> bool:
         """Check if cells have moved in the martix."""
         return any(cell.moved for row in self.matrix for cell in row)
 
-    def prepare_cells_to_move(self) -> None:
+    def prepare_cells_to_move(self: "Matrix") -> None:
         """Cleanup cells' flags."""
         for row in self.matrix:
             for cell in row:

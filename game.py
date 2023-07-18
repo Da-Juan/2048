@@ -3,7 +3,7 @@ import curses
 import datetime
 import pathlib
 import sqlite3
-from typing import Any
+from types import TracebackType
 
 from direction import Direction
 
@@ -19,7 +19,7 @@ SCORE_DB = "~/.2048.db"
 class Game:
     """Main game class."""
 
-    def __init__(self):
+    def __init__(self: "Game") -> None:
         """Initialize the engine."""
         self.matrix = Matrix(MATRIX_WIDTH, MATRIX_HEIGHT)
 
@@ -38,7 +38,7 @@ class Game:
             self.matrix_win_height, self.score_win_width, 0, self.matrix_win_width + 1
         )
 
-    def __enter__(self):
+    def __enter__(self: "Game") -> "Game":
         """Initialize curses."""
         curses.curs_set(0)
         curses.cbreak()
@@ -50,7 +50,12 @@ class Game:
 
         return self
 
-    def __exit__(self, exc_type: Exception, exc_value: Any, exc_traceback: Any) -> None:
+    def __exit__(
+        self: "Game",
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        exc_traceback: TracebackType | None,
+    ) -> None:
         """Cleanup curses."""
         curses.nocbreak()
         self._stdscr.keypad(False)  # noqa: FBT003
@@ -96,7 +101,7 @@ class Game:
 
         return 0
 
-    def run(self):
+    def run(self: "Game") -> tuple[bool, int, int]:
         """Run the game loop."""
         while True:
             key = self._stdscr.getch()
@@ -117,7 +122,7 @@ class Game:
                 break
         return self.matrix.is_full(), self.matrix.score, self.get_score_position()
 
-    def draw_matrix(self) -> None:
+    def draw_matrix(self: "Game") -> None:
         """
         Draw the matrix in its window.
 
@@ -140,7 +145,7 @@ class Game:
             self.matrix_win.addstr(f"{delimiter}\n")
         self.matrix_win.refresh()
 
-    def draw_score(self) -> None:
+    def draw_score(self: "Game") -> None:
         """Draw the score in its window."""
         self.score_win.erase()
         score = f"Score: {self.matrix.score}"
