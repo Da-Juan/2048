@@ -56,8 +56,7 @@ class Matrix:
         self.score = 0
 
     def add_new_value(self: "Matrix") -> None:
-        """
-        Add a new value, chosen between 2 and 4, to a random free cell if available.
+        """Add a new value, chosen between 2 and 4, to a random free cell if available.
 
         2 has an 90% chances to be drawn.
         """
@@ -113,8 +112,7 @@ class Matrix:
         self.matrix = [list(element)[::-1] for element in rotated][::-1]
 
     def move(self: "Matrix", direction: Direction) -> None:
-        r"""
-        Move cells in the given direction.
+        r"""Move cells in the given direction.
 
         According to next method I can only move cells to the right so to move in other
         directions I rotate the matrix. ¯\_(ツ)_/¯
@@ -144,8 +142,7 @@ class Matrix:
             self.add_new_value()
 
     def move_cell_to_right(self: "Matrix", x: int, y: int) -> None:
-        """
-        Move cells to the right.
+        """Move cells to the right.
 
         A non-zero cell moves freely over zero cells.
         If a cell of the same value is encountered, the cells are merged(values are

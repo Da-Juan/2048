@@ -122,8 +122,7 @@ class Game:
         return self.matrix.is_full(), self.matrix.score, self.get_score_position()
 
     def draw_matrix(self: "Game") -> None:
-        """
-        Draw the matrix in its window.
+        """Draw the matrix in its window.
 
         New cells are drawn in bold.
         """
