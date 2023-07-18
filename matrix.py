@@ -21,7 +21,7 @@ class Cell:
 
     def __eq__(self: "Cell", other: object) -> bool:
         """Compare cell's value with another cell's value or an integer."""
-        if not isinstance(other, (int, Cell)):
+        if not isinstance(other, int | Cell):
             return NotImplemented
         return self.value == (other if isinstance(other, int) else other.value)
 
