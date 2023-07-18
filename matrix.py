@@ -114,8 +114,8 @@ class Matrix:
     def move(self: "Matrix", direction: Direction) -> None:
         r"""Move cells in the given direction.
 
-        According to next method I can only move cells to the right so to move in other
-        directions I rotate the matrix. ¯\_(ツ)_/¯
+        I'm not very good with matrix, I could only figure how to move cells to the right
+        so to move in other directions I rotate the matrix then rotate it back. ¯\_(ツ)_/¯
         """
         self.prepare_cells_to_move()
         if direction == Direction.UP:
@@ -126,11 +126,8 @@ class Matrix:
             self.rotate_cw()
             self.rotate_cw()
 
-        for y in range(0, self.height):
-            for x in reversed(range(0, self.width)):
-                if self.matrix[y][x] == 0 or x >= self.width - 1:
-                    continue
-                self.move_cell_to_right(x, y)
+        self.move_cells()
+
         if direction == Direction.UP:
             self.rotate_ccw()
         if direction == Direction.DOWN:
@@ -140,6 +137,14 @@ class Matrix:
             self.rotate_ccw()
         if self.has_moved():
             self.add_new_value()
+
+    def move_cells(self: "Matrix") -> None:
+        """Browse the matrix and move cells to the right."""
+        for y in range(0, self.height):
+            for x in reversed(range(0, self.width)):
+                if self.matrix[y][x] == 0 or x >= self.width - 1:
+                    continue
+                self.move_cell_to_right(x, y)
 
     def move_cell_to_right(self: "Matrix", x: int, y: int) -> None:
         """Move cells to the right.
