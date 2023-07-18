@@ -6,7 +6,11 @@ from game import Game
 
 def get_suffix(n: int) -> str:
     """Get the ordinal english suffix for a given number."""
-    return "th" if 4 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    return (
+        "th"
+        if 4 <= n % 100 <= 20  # noqa: PLR2004
+        else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+    )
 
 
 if __name__ == "__main__":
