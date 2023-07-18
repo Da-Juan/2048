@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """My take on the 2048 game."""
 
 from game import Game
