@@ -36,7 +36,7 @@ class Cell:
 
     def __bool__(self: "Cell") -> bool:
         """Boolean operation."""
-        return not self.value == 0
+        return self.value != 0
 
 
 class Matrix:
