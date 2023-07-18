@@ -24,7 +24,7 @@ class Game:
 
         self._stdscr = curses.initscr()
         self._stdscr.clear()
-        self._stdscr.keypad(True)
+        self._stdscr.keypad(True)  # noqa: FBT003
 
         self.matrix_win_width = CELL_WIDTH * MATRIX_WIDTH + MATRIX_WIDTH + 2
         self.matrix_win_height = MATRIX_HEIGHT * 2 + 2
