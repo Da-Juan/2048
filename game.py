@@ -6,7 +6,6 @@ import sqlite3
 from types import TracebackType
 
 from direction import Direction
-
 from matrix import Matrix
 
 MATRIX_HEIGHT = 4
