@@ -1,5 +1,5 @@
 [tool.black]
-target-version = ['py39']
+target-version = ['py311']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -20,7 +20,7 @@ exclude = '''
 '''
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_calls = true
@@ -30,3 +30,17 @@ no_implicit_optional = true
 
 [tool.pylint.messages_control]
 disable = "C0103"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+lint.select = ["ALL"]
+lint.ignore = [
+    "D203",  # incompatible with D211
+    "D213",  # incompatible with D212
+    "T201",  # let me use print!
+    "S311",  # we don't do cryptography here
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
