@@ -36,8 +36,10 @@ line-length = 120
 target-version = "py311"
 lint.select = ["ALL"]
 lint.ignore = [
+    "COM812",  # incompatible with ruff formatter
     "D203",  # incompatible with D211
     "D213",  # incompatible with D212
+    "ISC001",  # incompatible with ruff formatter
     "T201",  # let me use print!
     "S311",  # we don't do cryptography here
 ]
