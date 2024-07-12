@@ -69,8 +69,8 @@ class Matrix:
         """Check if the matrix has empty (zero) cells or if cells can move."""
         if self.find_value(0):
             return False
-        for y in range(0, self.height):
-            for x in range(0, self.width):
+        for y in range(self.height):
+            for x in range(self.width):
                 if self.matrix[y][x] == 0:
                     continue
                 if self.matrix[y][x].value in self.get_neighbors(x, y):
@@ -138,8 +138,8 @@ class Matrix:
 
     def move_cells(self: "Matrix") -> None:
         """Browse the matrix and move cells to the right."""
-        for y in range(0, self.height):
-            for x in reversed(range(0, self.width)):
+        for y in range(self.height):
+            for x in reversed(range(self.width)):
                 if self.matrix[y][x] == 0 or x >= self.width - 1:
                     continue
                 self.move_cell_to_right(x, y)
