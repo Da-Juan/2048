@@ -1,4 +1,5 @@
 """Game moves."""
+
 from enum import Enum, auto
 
 

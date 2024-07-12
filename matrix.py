@@ -1,4 +1,5 @@
 """Game elements."""
+
 import random
 from dataclasses import dataclass
 from typing import Self

@@ -1,4 +1,5 @@
 """Game engine."""
+
 import curses
 import datetime
 import pathlib
